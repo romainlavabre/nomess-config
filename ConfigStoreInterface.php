@@ -7,9 +7,10 @@ use Nomess\Component\Config\Exception\ConfigurationNotFoundException;
 interface ConfigStoreInterface
 {
     
-    public const DEFAULT_NOMESS    = 'nomess';
+    public const DEFAULT_NOMESS    = 'application';
     public const DEFAULT_CONTAINER = 'container';
     public const DEFAULT_PARAMETER = 'parameter';
+    public const DEFAULT_CACHE     = 'cache';
     
     
     /**
@@ -24,7 +25,7 @@ interface ConfigStoreInterface
      * Return an array with a configuration
      *
      * @param string $name
-     * @return array|null
+     * @return array
      * @throws ConfigurationNotFoundException
      */
     public function get( string $name ): array;
