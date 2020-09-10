@@ -4,7 +4,6 @@ namespace Nomess\Component\Config;
 
 use Nomess\Component\Config\Exception\ConfigurationNotFoundException;
 
-define( 'ROOT', str_replace( 'vendor/nomess/config', '', __DIR__ ) );
 
 class ConfigHandler implements ConfigStoreInterface
 {
@@ -65,8 +64,13 @@ class ConfigHandler implements ConfigStoreInterface
      */
     private function parse( string $name ): array
     {
-        if( $name === ( ConfigStoreInterface::DEFAULT_NOMESS | ConfigStoreInterface::DEFAULT_CONTAINER | ConfigStoreInterface::DEFAULT_PARAMETER ) ) {
-            if( ConfigStoreInterface::DEFAULT_NOMESS ) {
+        if( $name === ConfigStoreInterface::DEFAULT_NOMESS
+            || $name === ConfigStoreInterface::DEFAULT_CONTAINER
+            || $name === ConfigStoreInterface::DEFAULT_PARAMETER
+            || $name === ConfigStoreInterface::DEFAULT_CACHE) {
+            
+            
+            if( $name === ConfigStoreInterface::DEFAULT_NOMESS ) {
                 
                 return $this->parseFile( self::CONFIG_ROOT . ConfigStoreInterface::DEFAULT_NOMESS . '.yaml', FALSE );
             }
@@ -74,10 +78,9 @@ class ConfigHandler implements ConfigStoreInterface
             return $this->parseFile( self::CONFIG_ROOT . $name . '.yaml' );
         }
         
-        if( file_exists( $filename = self::CONFIG_ROOT . $this->config[ConfigStoreInterface::DEFAULT_NOMESS]['path']['default_config_component'] . $name . 'yaml' ) ) {
+        if( file_exists( $filename = $this->config[ConfigStoreInterface::DEFAULT_NOMESS]['general']['path']['default_config_component'] . $name . '.yaml' ) ) {
             return $this->parseFile( $filename );
         }
-        
         throw new ConfigurationNotFoundException( 'The file "' . $name . '.yaml" was not found' );
     }
     
@@ -91,9 +94,9 @@ class ConfigHandler implements ConfigStoreInterface
      */
     private function parseFile( string $filename, bool $accept_overwritten = TRUE ): array
     {
-        if( ROOT === 'DEV'
-            && file_exists( str_replace( '.yaml', $this->overwrite_extension . '.yaml', $filename ) )
-            && $accept_overwritten ) {
+        if( NOMESS_CONTEXT === 'DEV'
+            && $accept_overwritten
+            && file_exists( str_replace( '.yaml', $this->overwrite_extension . '.yaml', $filename ) )) {
             
             return $this->parseArray(
                 yaml_parse_file( str_replace( '.yaml', $this->overwrite_extension . '.yaml', $filename ) )
@@ -117,7 +120,7 @@ class ConfigHandler implements ConfigStoreInterface
         array_walk_recursive( $array, function ( &$value ) {
             if( is_string( $value ) ) {
                 if( strpos( $value, '%ROOT%' ) !== FALSE ) {
-                    str_replace( '%ROOT%', ROOT, $value );
+                    $value = str_replace( '%ROOT%', ROOT, $value );
                 }
             }
         } );

@@ -25,7 +25,7 @@ interface ConfigStoreInterface
      * Return an array with a configuration
      *
      * @param string $name
-     * @return array
+     * @return array|null
      * @throws ConfigurationNotFoundException
      */
     public function get( string $name ): array;
