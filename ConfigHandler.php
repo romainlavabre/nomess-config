@@ -2,6 +2,7 @@
 
 namespace Nomess\Component\Config;
 
+use Nomess\Component\Cache\CacheHandlerInterface;
 use Nomess\Component\Config\Exception\ConfigurationNotFoundException;
 
 
@@ -9,6 +10,8 @@ class ConfigHandler implements ConfigStoreInterface
 {
     
     private const CONFIG_ROOT = ROOT . 'config/';
+    private const CACHE_NAME = 'config';
+    private CacheHandlerInterface $cacheHandler;
     private array  $config = array();
     private string $overwrite_extension;
     
@@ -64,6 +67,7 @@ class ConfigHandler implements ConfigStoreInterface
      */
     private function parse( string $name ): array
     {
+        
         if( $name === ConfigStoreInterface::DEFAULT_NOMESS
             || $name === ConfigStoreInterface::DEFAULT_CONTAINER
             || $name === ConfigStoreInterface::DEFAULT_PARAMETER
@@ -81,6 +85,7 @@ class ConfigHandler implements ConfigStoreInterface
         if( file_exists( $filename = $this->config[ConfigStoreInterface::DEFAULT_NOMESS]['general']['path']['default_config_component'] . $name . '.yaml' ) ) {
             return $this->parseFile( $filename );
         }
+        
         throw new ConfigurationNotFoundException( 'The file "' . $name . '.yaml" was not found' );
     }
     
